@@ -12,7 +12,7 @@ public class TouchManager : MonoBehaviour
     //singleton
     private static TouchManager _instance;
 
-    public static TouchManager Instance
+    private static TouchManager Instance
     {
         get
         {
@@ -29,16 +29,98 @@ public class TouchManager : MonoBehaviour
         }
     }
 
+    private event System.Action<TouchManager> _began;
+    private event System.Action<TouchManager> _moved;
+    private event System.Action<TouchManager> _ended;
 
-    // Start is called before the first frame update
-    void Start()
+    //when touch
+    public static event System.Action<TouchManager> Began
     {
-        
+        add
+        {
+            Instance._began += value;
+        }
+        remove
+        {
+            Instance._began -= value;
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    //during touch
+    public static event System.Action<TouchManager> Moved
     {
-        
+        add
+        {
+            Instance._moved += value;
+        }
+        remove
+        {
+            Instance._moved -= value;
+        }
     }
+
+    //remove touch
+    public static event System.Action<TouchManager> Ended
+    {
+        add
+        {
+            Instance._ended += value;
+        }
+        remove
+        {
+            Instance._ended -= value;
+        }
+    }
+
+    //current touch state
+    private TouchState State
+    {
+        get
+        {
+#if IS_EDITOR
+            //EDITOR
+            if (Input.GetMouseButtonDown(0))
+            {
+                return TouchState.Began;
+            }
+            else if (Input.GetMouseButtonDown(0))
+            {
+                return TouchState.Moved;
+            }
+            else if (Input.GetMouseButtonDown(0))
+            {
+                return TouchState.Ended;
+            }
+#else
+            //exclude EDITOR
+            if (Input.touchCount > 0)
+            {
+                switch (Input.GetTouch(0).phase)
+                {
+                    case TouchPhase.Began:
+                        return TouchState.Began;
+                    case TouchPhase.Moved:
+                    case TouchPhase.Stationary:
+                        return TouchState.Moved;
+                    case TouchPhase.Canceled:
+                    case TouchPhase.Ended:
+                        return TouchState.Ended;
+                    default:
+                        break;
+                }
+            }
+#endif
+            return TouchState.None;
+        }
+
+
+    //touch state
+    private enum TouchState
+    {
+        None = 0, //no touch
+        Began = 1, //began touch
+        Moved = 2, //during touch
+        Ended = 3, //end touch
+    }
+
 }
