@@ -84,11 +84,11 @@ public class TouchManager : MonoBehaviour
             {
                 return TouchState.Began;
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (Input.GetMouseButton(0))
             {
                 return TouchState.Moved;
             }
-            else if (Input.GetMouseButtonDown(0))
+            else if (Input.GetMouseButtonUp(0))
             {
                 return TouchState.Ended;
             }
